@@ -62,21 +62,33 @@ export const getSessionById = async (req, res) => {
  * @route   POST /api/sessions/:id/messages
  * @access  Private
  */
+// Replace the existing addMessageToSession function
 export const addMessageToSession = async (req, res) => {
     try {
+        console.log('[Controller] Received request to add message.');
         const { content } = req.body;
         const session = await Session.findById(req.params.id);
+
         if (!session || session.userId.toString() !== req.user._id.toString()) {
             return res.status(404).json({ message: 'Session not found' });
         }
+
         session.messages.push({ role: 'user', content });
         const history = session.messages.slice(0, -1);
+
+        console.log('[Controller] Calling AI service...');
         const aiResponseText = await generateText(content, history);
+        console.log('[Controller] AI service returned a response.');
+
         session.messages.push({ role: 'model', content: aiResponseText });
+
+        console.log('[Controller] Saving session to database...');
         await session.save();
+        console.log('[Controller] Session saved. Sending response to frontend.');
+        
         res.status(200).json(session);
     } catch (error) {
-        console.error(error);
+        console.error('[Controller] An error occurred:', error);
         res.status(500).json({ message: 'Error processing message' });
     }
 };

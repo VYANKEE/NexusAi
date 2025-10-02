@@ -4,12 +4,13 @@ import OpenAI from 'openai';
 const openai = new OpenAI({
   apiKey: process.env.NVIDIA_API_KEY,
   baseURL: 'https://integrate.api.nvidia.com/v1',
+  timeout: 30 * 1000, // 30 second timeout
 });
 
 export async function generateText(prompt, history) {
   // Prepare the message history in the format the API expects
   const messages = history.map(msg => ({
-    role: msg.role === 'model' ? 'assistant' : 'user', // Convert 'model' to 'assistant'
+    role: msg.role === 'model' ? 'assistant' : 'user',
     content: msg.content
   }));
 
