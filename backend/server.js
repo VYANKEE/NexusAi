@@ -18,8 +18,7 @@ const app = express();
 connectDB();
 
 const corsOptions = {
-  origin: 'http://localhost:5173',
-   'https://nexusaivenky.netlify.app/',
+  origin:   'https://nexusaivenky.netlify.app/',
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
