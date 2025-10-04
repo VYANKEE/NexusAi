@@ -2,6 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
 import helmet from 'helmet';
+import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -16,21 +17,37 @@ const __dirname = path.dirname(__filename);
 const app = express();
 connectDB();
 
-app.use(cors()); // Use default CORS for simplicity
-app.use(helmet({ contentSecurityPolicy: false })); // Adjust helmet for serving files
+// --- NEW, MORE ROBUST CORS CONFIGURATION ---
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:5173'];
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+// --- END NEW CORS CONFIGURATION ---
+
+
+app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(express.json());
 
-// --- API Routes ---
+app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+app.use('/videos', express.static(path.join(__dirname, 'public', 'videos')));
+
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
 app.use('/api/auth', authRoutes);
 app.use('/api/sessions', sessionRoutes);
 app.use('/api/image', imageRoutes);
-
-// --- Serve Frontend ---
-app.use(express.static(path.join(__dirname, 'public', 'dist')));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'public', 'dist', 'index.html'));
-});
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
