@@ -18,7 +18,7 @@ const app = express();
 connectDB();
 
 const corsOptions = {
-  origin:   'https://nexusaivenky.netlify.app/',
+  origin:   'https://nexus-ai-seven-pi.vercel.app',
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
