@@ -21,7 +21,7 @@ const ImageGeneratorPage = () => {
     try {
       const response = await generateImage(prompt);
       // We need to construct the full URL since the backend returns a relative path
-      const fullImageUrl = `http://localhost:5001${response.data.url}`;
+      const fullImageUrl = `https://nexusai-iunv.onrender.com${response.data.url}`;
       setImageUrl(fullImageUrl);
     } catch (err) {
       setError('Failed to generate image. Please try again later.');

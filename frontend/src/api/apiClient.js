@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5001/api',
+  baseURL: 'https://nexusai-iunv.onrender.com/api',
 });
 
 apiClient.interceptors.request.use(
