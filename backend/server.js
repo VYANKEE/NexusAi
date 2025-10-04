@@ -2,7 +2,6 @@ import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
 import helmet from 'helmet';
-import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -17,23 +16,21 @@ const __dirname = path.dirname(__filename);
 const app = express();
 connectDB();
 
-const corsOptions = {
-  origin: 'http://localhost:5173',
-  optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
-app.use(helmet({ crossOriginResourcePolicy: false }));
+app.use(cors()); // Use default CORS for simplicity
+app.use(helmet({ contentSecurityPolicy: false })); // Adjust helmet for serving files
 app.use(express.json());
 
-app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
-
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-}
-
+// --- API Routes ---
 app.use('/api/auth', authRoutes);
 app.use('/api/sessions', sessionRoutes);
 app.use('/api/image', imageRoutes);
+
+// --- Serve Frontend ---
+app.use(express.static(path.join(__dirname, 'public', 'dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'public', 'dist', 'index.html'));
+});
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

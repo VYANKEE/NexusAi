@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-const apiClient = axios.create({
-  baseURL: 'http://localhost:5001/api',
-});
+const API_URL = '/api';
 
+const apiClient = axios.create({
+  baseURL: API_URL,
+});
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
